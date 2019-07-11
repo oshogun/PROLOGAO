@@ -1,7 +1,10 @@
 ?- use_module(library(clpfd)).
 
+% Descrição do problema tradicional de sudoku 4x4, usando constraints.
+% O tabuleiro é descrito como uma lista de listas, cada lista representando
+% uma linha do tabuleiro.
 sudoku4x4(Rows) :-
-        length(Rows, 4),
+        length(Rows, 4), 
         maplist(same_length(Rows), Rows),
         append(Rows, Vs), 
         Vs ins 1..4,
@@ -14,35 +17,14 @@ sudoku4x4(Rows) :-
                 [D1, D2, D3, D4]],
         blocks([A1, A2, A3, A4], [B1, B2, B3, B4]),
         blocks([C1, C2, C3, C4], [D1, D2, D3, D4]).
-
+% Predicados que preenchem, recursivamente, as linhas do sudoku.
 blocks([], []).
 blocks([N1,N2|Ns1], [N3,N4|Ns2]) :-
         all_distinct([N1,N2,N3,N4]),
         blocks(Ns1, Ns2).
 
-compare4x4test(Rows) :-
-    sudoku4x4(Rows),
-    Rows = [[A1, A2, A3, A4],
-                [B1, B2, B3, B4],
-                [C1, C2, C3, C4],
-                [D1, D2, D3, D4]],
-    A1 #< A2,
-    A3 #> A4,
-    B1 #> A1,
-    B2 #> A2, 
-    B3 #< A3, 
-    B4 #< A4, 
-    B1 #> B2, 
-    B3 #< B4,
-    C1 #< C2,
-    C3 #> C4,
-    D1 #< C1, 
-    D2 #< C2, 
-    D3 #> C3, 
-    D4 #> C4,
-    D1 #> D2, 
-    D3 #< D4.
-
+% Problema de compare sudoku 4x4. Recebe uma lista de regras para comparar
+% os elementos do tabuleiro e invoca os predicados correspondentes.
 compare4x4(Rows, Rules) :-
     sudoku4x4(Rows),
     Rows = [[A1, A2, A3, A4],
@@ -70,10 +52,11 @@ compare4x4(Rows, Rules) :-
     call(D4C4, D4, C4),
     call(D1D2, D1, D2),
     call(D3D4, D3, D4).
-
+% Exemplo de input:
 % ?- Rules = [l, g, g, g, l, l, g, l, l, g, l, l, g, g, g, l],
 % compare4x4(Rows,Rules),maplist(label,Rows), maplist(portray_clause,Rows).
 
+% Idêntico ao sudoku 4x4, porém com 6x6 elementos. 
 sudoku6x6(Rows) :-
         length(Rows, 6),
         maplist(same_length(Rows), Rows),
@@ -96,6 +79,7 @@ blocks([N1,N2|Ns1], [N3,N4|Ns2], [N5, N6|Ns3]) :-
         all_distinct([N1,N2,N3,N4, N5, N6]),
         blocks(Ns1, Ns2, Ns3).
 
+% Idêntico ao compare 4x4, porém para o tabuleiro 6x6
 compare6x6(Rows, Rules) :-
     sudoku6x6(Rows),
     Rows = [[A1, A2, A3, A4, A5, A6],
@@ -157,7 +141,10 @@ compare6x6(Rows, Rules) :-
     call(F3F4, F3, F4),
     call(F5F6, F5, F6).
 
-g(A, B) :- A #> B.
-l(A, B) :- A #< B.
+% Os dois predicados de comparação que são usados pelo compare sudoku
+g(A, B) :- A #> B. % greater
+l(A, B) :- A #< B. % lesser
+
+% Exemplo de input para o sudoku 6x6
 % ?- Rules = [l, l, g, g, l, g, l, l, g, g, g, l, l, l, g, g, g, l, g, g, g, l, l, l, g, l, g, g, l, l, g, l, l, l, g, g, l, g, l, l, g, g],
 % compare6x6(Rows,Rules),maplist(label,Rows), maplist(portray_clause,Rows).
